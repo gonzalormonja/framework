@@ -79,18 +79,19 @@ class Collection extends BaseCollection implements QueueableCollection
             ->whereKey($this->modelKeys())
             ->select($this->first()->getKeyName())
             ->withCount(...func_get_args())
-            ->get()
-            ->keyBy($this->first()->getKeyName());
+            ->get();
 
         $attributes = Arr::except(
             array_keys($models->first()->getAttributes()),
             $models->first()->getKeyName()
         );
 
-        $this->each(function ($model) use ($models, $attributes) {
-            $extraAttributes = Arr::only($models->get($model->getKey())->getAttributes(), $attributes);
-
-            $model->forceFill($extraAttributes)->syncOriginalAttributes($attributes);
+        $models->each(function ($model) use ($attributes) {
+            $this->where($this->first()->getKeyName(), $model->getKey())
+                ->each
+                ->forceFill(Arr::only($model->getAttributes(), $attributes))
+                ->each
+                ->syncOriginalAttributes($attributes);
         });
 
         return $this;

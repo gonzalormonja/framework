@@ -48,7 +48,7 @@ class SqlServerGrammar extends Grammar
     {
         return "select col.name from sys.columns as col
                 join sys.objects as obj on col.object_id = obj.object_id
-                where obj.type = 'U' and obj.object_id = object_id('$table')";
+                where obj.type = 'U' and obj.name = '$table'";
     }
 
     /**
@@ -374,7 +374,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeChar(Fluent $column)
     {
-        return "nchar({$column->length})";
+        return "char({$column->length})";
     }
 
     /**
@@ -385,7 +385,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeString(Fluent $column)
     {
-        return "nvarchar({$column->length})";
+        return "varchar({$column->length})";
     }
 
     /**
@@ -846,7 +846,17 @@ class SqlServerGrammar extends Grammar
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
         if (in_array($column->type, $this->serials) && $column->autoIncrement) {
-            return ' identity primary key';
+            //inicio codigo agregado por gonzalo monja
+            $declaraClavePrimaria = false;
+            foreach($blueprint->getCommands() as $command){
+                if($command->name == "primary"){
+                    $declaraClavePrimaria = true;
+                }
+            }
+            return $declaraClavePrimaria ? ' identity ' : ' identity primary key';
+            //fin codigo agregado por gonzalo monja
+            //codigo anterior
+            //return ' identity primary key ';
         }
     }
 

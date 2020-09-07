@@ -682,7 +682,7 @@ trait HasRelationships
      */
     public function touches($relation)
     {
-        return in_array($relation, $this->getTouchedRelations());
+        return in_array($relation, $this->touches);
     }
 
     /**
@@ -692,7 +692,7 @@ trait HasRelationships
      */
     public function touchOwners()
     {
-        foreach ($this->getTouchedRelations() as $relation) {
+        foreach ($this->touches as $relation) {
             $this->$relation()->touch();
 
             if ($this->$relation instanceof self) {
